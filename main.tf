@@ -37,42 +37,75 @@ module "routeTables" {
   private_subnet_id = "${module.subnets.*.private-subnets-id}"
 }
 
+# Creating key pair to enable ssh connection to ec2 instance
+resource "aws_key_pair" "ec2" {
+  key_name   = "connection-key"
+  public_key = "${file("~/.ssh/ec2.pub")}"
+}
 
+# Creating security group for VPC
+resource "aws_security_group" "application" {
+  vpc_id = "${aws_vpc.main_vpc.id}"
 
-# # Route Table for Public Subnet
-# resource "aws_route_table" "public" {
-#   vpc_id = "${aws_vpc.main_vpc.id}"
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
+    ipv6_cidr_blocks = [ "::/0" ]
+  }
 
-#   route {
-#     cidr_block = "${var.publicroutetablecidr}"
-#     gateway_id = "${aws_internet_gateway.igw.id}"
-#   }
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
+    ipv6_cidr_blocks = [ "::/0" ]
+  }
 
-#   tags = {
-#     Name = "Public Route Table"
-#   }
-# }
+  ingress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
+    ipv6_cidr_blocks = [ "::/0" ]
+  }
 
-# # Association between Public Subnet and Public Route Table
-# resource "aws_route_table_association" "public" {
-#     count = "${min(length(data.aws_availability_zones.azs.names),3)}"
-#     subnet_id      = "${element(module.subnets.*.public-subnets-id, count.index)}"
-#     route_table_id = "${aws_route_table.public.id}"
-# }
+  ingress {
+    from_port = 8080
+    to_port = 8080
+    protocol = "tcp"
+    cidr_blocks = [ "0.0.0.0/0" ]
+    ipv6_cidr_blocks = [ "::/0" ]
+  }
 
-# # Route Table for Private Subnet
-# resource "aws_route_table" "private" {
-#   vpc_id = "${aws_vpc.main_vpc.id}"
+  egress {
+    cidr_blocks = [ "0.0.0.0/0" ]
+    from_port = 0
+    ipv6_cidr_blocks = [ "::/0" ]
+    protocol = -1
+    to_port = 0
+  }
 
-#   tags = {
-#     Name = "Private Route Table"
-#   }
-# }
+  tags = {
+    "Name" = "application"
+  }
+}
 
-# # Association between Private Subnet and Priavte Route Table
-# resource "aws_route_table_association" "private" {
-#     count = "${min(length(data.aws_availability_zones.azs.names),3)}"
-#     subnet_id      = "${element(module.subnets.*.private-subnets-id, count.index)}"
-#     route_table_id = "${aws_route_table.private.id}"
-# }
-
+# Creating ec2 instance for latest ami available
+resource "aws_instance" "my_ec2_instance" {
+  ami = "${data.aws_ami.my-node-ami.id}"
+  instance_type = "t2.micro"
+  disable_api_termination = false
+  root_block_device {
+    volume_size = 50
+    volume_type = "gp2"
+    delete_on_termination = true
+  }
+  subnet_id = "${module.subnets[0].public-subnets-id}"
+  security_groups = ["${aws_security_group.application.id}"]
+  key_name = "${aws_key_pair.ec2.key_name}"
+  tags = {
+    "Name" = "Application Server"
+  }
+}
