@@ -14,22 +14,51 @@ variable "publicroutetablecidr" {
   default = "0.0.0.0/0"
 }
 
-data "aws_ami" "my-node-ami" {
-  most_recent      = true
-  owners           = ["377562592179"]
+# data "aws_ami" "my-node-ami" {
+#   most_recent      = true
+#   owners           = ["377562592179"]
 
-  filter {
-    name   = "name"
-    values = ["NodeApp_*"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["NodeApp_*"]
+#   }
 
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
+#   filter {
+#     name   = "root-device-type"
+#     values = ["ebs"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
+
+variable "configuration" {
+  description = "Configuration Settings"
+  type        = map(any)
+  default = {
+    "database" = {
+      allocated_storage   = 20
+      engine              = "mysql"
+      instance_class      = "db.t3.micro"
+      db_name             = "csye6225"
+      skip_final_snapshot = true
+    },
+    "ec2_instance" = {
+      instance_type = "t2.micro"
+      volume_size   = 50
+      volume_type   = "gp2"
+    }
   }
+}
+
+variable "db_username" {
+  type      = string
+  sensitive = true
+}
+
+variable "db_password" {
+  type      = string
+  sensitive = true
 }
