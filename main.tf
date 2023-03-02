@@ -120,8 +120,8 @@ resource "aws_security_group" "database" {
 
 # Creating ec2 instance for latest ami available
 resource "aws_instance" "my_ec2_instance" {
-  # ami = "${data.aws_ami.my-node-ami.id}"
-  ami                     = "ami-0dfcb1ef8550277af"
+  ami = "${data.aws_ami.my-node-ami.id}"
+  # ami                     = "ami-0dfcb1ef8550277af"
   instance_type           = var.configuration.ec2_instance.instance_type
   disable_api_termination = false
   root_block_device {
@@ -132,6 +132,18 @@ resource "aws_instance" "my_ec2_instance" {
   subnet_id       = module.subnets[0].public-subnets-id
   security_groups = ["${aws_security_group.application.id}"]
   key_name        = aws_key_pair.ec2.key_name
+
+  user_data = <<EOF
+  #!/bin/bash
+
+  echo "==================================="
+  echo "Creating .env file to webapp"
+  echo "==================================="
+  touch /home/ec2-user/webapp/.env
+  echo -e "PORT=8080\nDB_HOSTNAME=${aws_db_instance.app_db.address}\nDB_PORT=3306\nDB_USERNAME=${var.db_username}\nDB_PASSWORD=${var.db_password}\nDB_DBNAME=${var.configuration.database.db_name}\nAWS_BUCKET_NAME=${aws_s3_bucket.main_s3_bucket.bucket}\nAWS_BUCKET_REGION=${var.region}" > /home/ec2-user/webapp/.env
+
+  EOF
+
   tags = {
     "Name" = "Application Server"
   }
