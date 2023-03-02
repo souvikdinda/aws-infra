@@ -14,25 +14,25 @@ variable "publicroutetablecidr" {
   default = "0.0.0.0/0"
 }
 
-# data "aws_ami" "my-node-ami" {
-#   most_recent      = true
-#   owners           = ["377562592179"]
+data "aws_ami" "my-node-ami" {
+  most_recent      = true
+  owners           = ["377562592179"]
 
-#   filter {
-#     name   = "name"
-#     values = ["NodeApp_*"]
-#   }
+  filter {
+    name   = "name"
+    values = ["NodeApp_*"]
+  }
 
-#   filter {
-#     name   = "root-device-type"
-#     values = ["ebs"]
-#   }
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
 
-#   filter {
-#     name   = "virtualization-type"
-#     values = ["hvm"]
-#   }
-# }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
 
 variable "configuration" {
   description = "Configuration Settings"
@@ -55,10 +55,10 @@ variable "configuration" {
 
 variable "db_username" {
   type      = string
-  sensitive = true
+  default = "csye6225"
 }
 
 variable "db_password" {
   type      = string
-  sensitive = true
+  default = "Passw0rd#123"
 }
