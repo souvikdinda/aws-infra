@@ -62,3 +62,11 @@ variable "db_password" {
   type      = string
   default = "Passw0rd#123"
 }
+
+variable "aws_access_key" {
+  type      = string
+}
+
+variable "aws_secret_access_key" {
+  type      = string
+}
