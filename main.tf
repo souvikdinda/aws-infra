@@ -140,7 +140,12 @@ resource "aws_instance" "my_ec2_instance" {
   echo "Creating .env file to webapp"
   echo "==================================="
   touch /home/ec2-user/webapp/.env
-  echo -e "PORT=8080\nDB_HOSTNAME=${aws_db_instance.app_db.address}\nDB_PORT=3306\nDB_USERNAME=${var.db_username}\nDB_PASSWORD=${var.db_password}\nDB_DBNAME=${var.configuration.database.db_name}\nAWS_BUCKET_NAME=${aws_s3_bucket.main_s3_bucket.bucket}\nAWS_BUCKET_REGION=${var.region}" > /home/ec2-user/webapp/.env
+  echo -e "PORT=8080\nDB_HOSTNAME=${aws_db_instance.app_db.address}\nDB_PORT=3306\nDB_USERNAME=${var.db_username}\nDB_PASSWORD=\"${var.db_password}\"\nDB_DBNAME=${var.configuration.database.db_name}\nAWS_BUCKET_NAME=${aws_s3_bucket.main_s3_bucket.bucket}\nAWS_BUCKET_REGION=${var.region}\nAWS_ACCESS_KEY=\"${aws_access_key}\"AWS_SECRET_ACCESS_KEY=\"${var.aws_secret_access_key}\"" > /home/ec2-user/webapp/.env
+
+  echo "==================================="
+  echo "Chaning application ownership"
+  echo "==================================="
+  sudo chmod -R 711 /home/ec2-user/webapp
 
   EOF
 
