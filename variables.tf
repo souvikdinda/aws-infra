@@ -15,8 +15,8 @@ variable "publicroutetablecidr" {
 }
 
 data "aws_ami" "my-node-ami" {
-  most_recent      = true
-  owners           = ["377562592179"]
+  most_recent = true
+  owners      = ["377562592179"]
 
   filter {
     name   = "name"
@@ -54,19 +54,19 @@ variable "configuration" {
 }
 
 variable "db_username" {
-  type      = string
+  type    = string
   default = "csye6225"
 }
 
 variable "db_password" {
-  type      = string
+  type    = string
   default = "Passw0rd#123"
 }
 
 variable "aws_access_key" {
-  type      = string
+  type = string
 }
 
 variable "aws_secret_access_key" {
-  type      = string
+  type = string
 }
