@@ -129,9 +129,10 @@ resource "aws_instance" "my_ec2_instance" {
     volume_type           = var.configuration.ec2_instance.volume_type
     delete_on_termination = true
   }
-  subnet_id       = module.subnets[0].public-subnets-id
-  security_groups = ["${aws_security_group.application.id}"]
-  key_name        = aws_key_pair.ec2.key_name
+  subnet_id            = module.subnets[0].public-subnets-id
+  security_groups      = ["${aws_security_group.application.id}"]
+  key_name             = aws_key_pair.ec2.key_name
+  iam_instance_profile = aws_iam_instance_profile.ec2-profile.name
 
   user_data = <<EOF
   #!/bin/bash
@@ -140,7 +141,7 @@ resource "aws_instance" "my_ec2_instance" {
   echo "Creating .env file to webapp"
   echo "==================================="
   touch /home/ec2-user/webapp/.env
-  echo -e "PORT=8080\nDB_HOSTNAME=${aws_db_instance.app_db.address}\nDB_PORT=3306\nDB_USERNAME=${var.db_username}\nDB_PASSWORD=\"${var.db_password}\"\nDB_DBNAME=${var.configuration.database.db_name}\nAWS_BUCKET_NAME=${aws_s3_bucket.main_s3_bucket.bucket}\nAWS_BUCKET_REGION=${var.region}\nAWS_ACCESS_KEY=\"${var.aws_access_key}\"\nAWS_SECRET_ACCESS_KEY=\"${var.aws_secret_access_key}\"" > /home/ec2-user/webapp/.env
+  echo -e "PORT=8080\nDB_HOSTNAME=${aws_db_instance.app_db.address}\nDB_PORT=3306\nDB_USERNAME=${var.db_username}\nDB_PASSWORD=\"${var.db_password}\"\nDB_DBNAME=${var.configuration.database.db_name}\nAWS_BUCKET_NAME=${aws_s3_bucket.main_s3_bucket.bucket}\nAWS_BUCKET_REGION=${var.region}" > /home/ec2-user/webapp/.env
 
   echo "==================================="
   echo "Chaning application ownership"
@@ -154,3 +155,11 @@ resource "aws_instance" "my_ec2_instance" {
   }
 }
 
+resource "aws_route53_record" "route53-record" {
+  zone_id = var.hosted_zone_id
+  name    = var.hosted_zone_name
+  type    = "A"
+  ttl     = 60
+
+  records = [aws_instance.my_ec2_instance.public_ip]
+}

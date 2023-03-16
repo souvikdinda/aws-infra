@@ -63,10 +63,12 @@ variable "db_password" {
   default = "Passw0rd#123"
 }
 
-variable "aws_access_key" {
-  type = string
+variable "hosted_zone_id" {
+  type    = string
+  default = "Z056114913N7ZVZ9CPNAB"
 }
 
-variable "aws_secret_access_key" {
-  type = string
+variable "hosted_zone_name" {
+  type    = string
+  default = "dev.souvikdinda.me"
 }

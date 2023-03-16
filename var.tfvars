@@ -1,3 +1,3 @@
-region                = "us-east-1"
-aws_access_key        = ""
-aws_secret_access_key = ""
+region           = "us-east-1"
+hosted_zone_id   = ""
+hosted_zone_name = ""
