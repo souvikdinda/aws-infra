@@ -58,7 +58,7 @@ resource "aws_iam_policy" "CloudWatchAgent" {
 
 resource "aws_iam_role" "ec2-csye6225" {
   name        = "EC2-CSYE6225"
-  description = "IAM Role for EC2 service"
+  description = "IAM role for EC2 service"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
