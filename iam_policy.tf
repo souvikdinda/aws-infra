@@ -23,6 +23,39 @@ resource "aws_iam_policy" "webapps3" {
   })
 }
 
+resource "aws_iam_policy" "CloudWatchAgent" {
+  name        = "CloudWatchAgent"
+  path        = "/"
+  description = "IAM Policy for CloudWatch Agent"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "cloudwatch:PutMetricData",
+          "ec2:DescribeVolumes",
+          "ec2:DescribeTags",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "logs:DescribeLogGroups",
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ssm:GetParameter"
+        ],
+        Resource = "arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "ec2-csye6225" {
   name        = "EC2-CSYE6225"
   description = "IAM Role for EC2 service"
@@ -45,10 +78,16 @@ resource "aws_iam_role" "ec2-csye6225" {
   }
 }
 
-resource "aws_iam_policy_attachment" "policy-attachment" {
+resource "aws_iam_policy_attachment" "S3-policy-attachment" {
   name       = "S3PolicyAttachment"
   roles      = ["${aws_iam_role.ec2-csye6225.name}"]
   policy_arn = aws_iam_policy.webapps3.arn
+}
+
+resource "aws_iam_policy_attachment" "CloudWatch-policy-attachment" {
+  name       = "CloudWatchPolicyAttachment"
+  roles      = ["${aws_iam_role.ec2-csye6225.name}"]
+  policy_arn = aws_iam_policy.CloudWatchAgent.arn
 }
 
 resource "aws_iam_instance_profile" "ec2-profile" {
