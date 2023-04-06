@@ -41,7 +41,8 @@ resource "aws_iam_policy" "CloudWatchAgent" {
           "logs:DescribeLogStreams",
           "logs:DescribeLogGroups",
           "logs:CreateLogStream",
-          "logs:CreateLogGroup"
+          "logs:CreateLogGroup",
+          "logs:DeleteLogGroup"
         ],
         Resource = "*"
       },
