@@ -63,12 +63,15 @@ variable "db_password" {
   default = "Passw0rd#123"
 }
 
-variable "hosted_zone_id" {
-  type    = string
-  default = "Z056114913N7ZVZ9CPNAB"
-}
-
-variable "hosted_zone_name" {
+variable "host_name" {
   type    = string
   default = "dev.souvikdinda.me"
+}
+
+data "aws_route53_zone" "zone_name" {
+  name = var.host_name
+}
+
+locals {
+  certificate_arn = var.host_name == "dev.souvikdinda.me" ? "arn:aws:acm:us-east-1:377562592179:certificate/026cd876-b2d9-42fc-8ea0-ff7881d4d31a" : "arn:aws:acm:us-east-1:085379417628:certificate/a6fa7cac-4477-42f7-b9a8-68d03f4f43c2"
 }
