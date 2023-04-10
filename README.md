@@ -6,12 +6,30 @@ _This project focuses on Creation and Management of Cloud Infra (AWS), following
 
 **Commands**
 1. Setup AWS credentials:
+    ```
     aws configure
-2. export AWS_PROFILE=_profilename_ (Linux/Mac) _or_ setx AWS_PROFILE _profilename_ (Windows)
+    ```
+2. Set profile to environment variables:
+    ```
+    export AWS_PROFILE=_profilename_ (Linux/Mac)
+    setx AWS_PROFILE _profilename_ (Windows)
+    ```
 3. terraform init
 4. terraform plan
 5. terraform apply -var-file="var.tfvars" --auto-approve
-6. terrafrom destroy -var-file="var.tfvars" --auto-approve (to destroy above created infra)
+6. Import SSL Certificate to AWS Certificate Manager using command:
+    ```
+    aws acm import-certificate --certificate fileb://~/.ssh/acm/cert.pem --private-key fileb://~/.ssh/acm/privkey.pem --certificate-chain fileb://~/.ssh/acm/fullchain.pem
+    ```
+7. Create Load Balancer Listener using above imported certificate:
+    ```
+    aws elbv2 create-listener --load-balancer-arn <lb-arn> --protocol HTTPS --port 443 --certificates CertificateArn=<cert-arn> --default-actions Type=forward,TargetGroupArn=<lb-target-grp-arn>
+    ```
+8. To perfrom instance refresh:
+    ```
+    aws autoscaling start-instance-refresh --auto-scaling-group-name autoscaling_group --preferences MinHealthyPercentage=90,InstanceWarmup=60 --strategy Rolling 
+    ```
+9. terrafrom destroy -var-file="var.tfvars" --auto-approve (to destroy above created infra)
 
 ### Working of the code:
 1. Creates **VPC** in given region with max 3 _Public_ and _Private_ **Subnets**, along with **RouteTables**, **Internet Gateway**

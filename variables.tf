@@ -73,5 +73,18 @@ data "aws_route53_zone" "zone_name" {
 }
 
 locals {
-  certificate_arn = var.host_name == "dev.souvikdinda.me" ? "arn:aws:acm:us-east-1:377562592179:certificate/026cd876-b2d9-42fc-8ea0-ff7881d4d31a" : "arn:aws:acm:us-east-1:085379417628:certificate/a6fa7cac-4477-42f7-b9a8-68d03f4f43c2"
+  certificate_arn = var.host_name == "dev.souvikdinda.me" ? "arn:aws:acm:us-east-1:377562592179:certificate/026cd876-b2d9-42fc-8ea0-ff7881d4d31a" : aws_acm_certificate.ssl_certificate.arn
+  aws_account_id = var.host_name == "dev.souvikdinda.me" ? "377562592179" : "085379417628"
+}
+
+output "load_balancer_arn" {
+  value = aws_lb.applicationLoadBalancer.arn
+}
+
+output "lb_target_group_arn" {
+  value = aws_lb_target_group.lb_target_group.arn
+}
+
+output "autoscaling_group_name" {
+  value = aws_autoscaling_group.autoscaling_group.name
 }
