@@ -22,7 +22,8 @@ _This project focuses on Creation and Management of Cloud Infra (AWS), following
 ### Architecture Diagram
 -----------------------
 
-![infra](https://user-images.githubusercontent.com/22276234/231334647-76481d35-bb97-43fb-af8a-c92d765d1e8b.jpg)
+![infra](https://user-images.githubusercontent.com/22276234/231337886-2a5462b9-dd1e-4364-859c-5ae3868789bf.png)
+
 
 
 ### Tools and Technologies
