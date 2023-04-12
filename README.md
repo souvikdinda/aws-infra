@@ -28,14 +28,12 @@ _This project focuses on Creation and Management of Cloud Infra (AWS), following
 ### Tools and Technologies
 -----------------------
 
-|-----------------------|-------------------------------------------|
 | Infrastructure        |   VPC, Route53, ALB, EC2, RDS, S3         |
 |-----------------------|-------------------------------------------|
 | Web Application       |   NodeJS, ExpressJS, MySQL, Sequelize     |
 | Alerting and logging  |   statsd, CloudWatch                      |
 | Custom AMI            |   Packer                                  |
 | IaC Language          |   Terraform                               |
-|-----------------------|-------------------------------------------|
 
 ### CI/CD
 -----------------------
@@ -53,20 +51,32 @@ _This project focuses on Creation and Management of Cloud Infra (AWS), following
 
 
 **Useful Commands**
------------------------
 
 1. Setup AWS credentials:
     ```
     aws configure
     ```
 2. Set profile to environment variables:
+    -   Linux/Mac
     ```
-    export AWS_PROFILE=_profilename_ (Linux/Mac)
-    setx AWS_PROFILE _profilename_ (Windows)
+    export AWS_PROFILE= <profilename>
     ```
-3. `terraform init`
-4. `terraform plan`
-5. `terraform apply -var-file="var.tfvars" --auto-approve`
+    -   Windows
+    ```
+    setx AWS_PROFILE <profilename>
+    ```
+3. Initialize Terraform:
+    ```
+    terraform init
+    ```
+4. Plan to apply changes:
+    ```
+    terraform plan
+    ```
+5. Apply terraform:
+    ```
+    terraform apply -var-file="var.tfvars" --auto-approve
+    ```
 6. Import SSL Certificate to AWS Certificate Manager using command:
     ```
     aws acm import-certificate --certificate fileb://path-to-file --private-key fileb://path-to-file --certificate-chain fileb://path-to-file
