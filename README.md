@@ -15,8 +15,8 @@ _This project focuses on Creation and Management of Cloud Infra (AWS), following
 -   **EC2** accepts traffic only through **Load Balancer** and **RDS** accepts only through **EC2 Instances**
 -   [IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html) Role and Policy and [Security Groups](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html) gets created to support above requirement
 -   [S3 Bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html) is used to store files with required permissions as per application requirement
-9. [CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html) is used for _logging, metrics monitoring and to trigger alarms in case of breach in threshold_
-10. [Route53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html) creates A record for given domain name and creates alias for **Load Balancer** DNS Name
+-   [CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html) is used for _logging, metrics monitoring and to trigger alarms in case of breach in threshold_
+-   [Route53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html) creates A record for given domain name and creates alias for **Load Balancer** DNS Name
 
 
 ### Architecture Diagram
