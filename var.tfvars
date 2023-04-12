@@ -1,1 +1,1 @@
-host_name        = "prod.souvikdinda.me"
+host_name = "prod.souvikdinda.me"

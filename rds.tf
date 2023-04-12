@@ -1,6 +1,6 @@
 resource "aws_kms_key" "rds_encryption_key" {
-  description             = "KMS key for RDS instance"
-  enable_key_rotation     = false
+  description         = "KMS key for RDS instance"
+  enable_key_rotation = false
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -13,12 +13,12 @@ resource "aws_kms_key" "rds_encryption_key" {
         Resource  = "*"
       },
       {
-        Sid       = "Allow usage of the key for RDS"
-        Effect    = "Allow"
+        Sid    = "Allow usage of the key for RDS"
+        Effect = "Allow"
         Principal = {
           AWS = ["arn:aws:iam::${local.aws_account_id}:root"]
         }
-        Action    = [
+        Action = [
           "kms:Encrypt",
           "kms:Decrypt",
           "kms:ReEncrypt*",
@@ -63,6 +63,6 @@ resource "aws_db_instance" "app_db" {
   parameter_group_name   = aws_db_parameter_group.db_parameters.id
   vpc_security_group_ids = ["${aws_security_group.database.id}"]
   skip_final_snapshot    = true
-  storage_encrypted = true
-  kms_key_id = aws_kms_key.rds_encryption_key.arn
+  storage_encrypted      = true
+  kms_key_id             = aws_kms_key.rds_encryption_key.arn
 }
