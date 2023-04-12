@@ -10,19 +10,19 @@ resource "aws_lb" "applicationLoadBalancer" {
 }
 
 resource "aws_lb_target_group" "lb_target_group" {
-  name     = "load-balancer-target-group"
-  port     = 8080
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main_vpc.id
+  name        = "load-balancer-target-group"
+  port        = 8080
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main_vpc.id
   target_type = "instance"
 
   health_check {
-    enabled = true
-    path = "/healthz"
-    port = 8080
-    healthy_threshold = 3
-    interval = 30
-    timeout = 5
+    enabled             = true
+    path                = "/healthz"
+    port                = 8080
+    healthy_threshold   = 3
+    interval            = 30
+    timeout             = 5
     unhealthy_threshold = 3
   }
 }
@@ -39,8 +39,8 @@ resource "aws_lb_listener" "listener_http" {
 }
 
 resource "aws_acm_certificate" "ssl_certificate" {
-  certificate_body = file("~/.ssh/acm/cert.pem")
-  private_key = file("~/.ssh/acm/privkey.pem")
+  certificate_body  = file("~/.ssh/acm/cert.pem")
+  private_key       = file("~/.ssh/acm/privkey.pem")
   certificate_chain = file("~/.ssh/acm/fullchain.pem")
 }
 

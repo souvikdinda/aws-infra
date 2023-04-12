@@ -74,7 +74,7 @@ data "aws_route53_zone" "zone_name" {
 
 locals {
   certificate_arn = var.host_name == "dev.souvikdinda.me" ? "arn:aws:acm:us-east-1:377562592179:certificate/026cd876-b2d9-42fc-8ea0-ff7881d4d31a" : aws_acm_certificate.ssl_certificate.arn
-  aws_account_id = var.host_name == "dev.souvikdinda.me" ? "377562592179" : "085379417628"
+  aws_account_id  = var.host_name == "dev.souvikdinda.me" ? "377562592179" : "085379417628"
 }
 
 output "load_balancer_arn" {

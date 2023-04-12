@@ -5,8 +5,8 @@ resource "aws_key_pair" "ec2" {
 }
 
 resource "aws_kms_key" "ebs_encryption_key" {
-  description             = "KMS key for EBS instance"
-  enable_key_rotation     = false
+  description         = "KMS key for EBS instance"
+  enable_key_rotation = false
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -23,91 +23,45 @@ resource "aws_kms_key" "ebs_encryption_key" {
 }
 
 resource "aws_launch_template" "asg_launch_template" {
-  name_prefix = "asg_launch_config"
-  # image_id = data.aws_ami.my-node-ami.id
-  image_id = "ami-0f7d2d40f81acc547"
+  name_prefix   = "asg_launch_config"
+  image_id      = data.aws_ami.my-node-ami.id
   instance_type = var.configuration.ec2_instance.instance_type
-  key_name = aws_key_pair.ec2.key_name
-  
+  key_name      = aws_key_pair.ec2.key_name
+
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2-profile.name
   }
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups = ["${aws_security_group.application.id}"]
+    security_groups             = ["${aws_security_group.application.id}"]
   }
 
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
       delete_on_termination = true
-      encrypted = true
-      volume_size = var.configuration.ec2_instance.volume_size
-      volume_type = var.configuration.ec2_instance.volume_type
-      kms_key_id = aws_kms_key.ebs_encryption_key.arn
+      encrypted             = true
+      volume_size           = var.configuration.ec2_instance.volume_size
+      volume_type           = var.configuration.ec2_instance.volume_type
+      kms_key_id            = aws_kms_key.ebs_encryption_key.arn
     }
   }
 
-  user_data = base64encode(join("\n",[
+  user_data = base64encode(join("\n", [
     "#!/bin/bash",
     "touch /home/ec2-user/webapp/.env",
     "echo -e \"PORT=8080\\nDB_HOSTNAME=${aws_db_instance.app_db.address}\\nDB_PORT=3306\\nDB_USERNAME=${var.db_username}\\nDB_PASSWORD=\\\"${var.db_password}\\\"\\nDB_DBNAME=${var.configuration.database.db_name}\\nAWS_BUCKET_NAME=${aws_s3_bucket.main_s3_bucket.bucket}\\nAWS_BUCKET_REGION=${var.region}\\nENVIRONMENT=production\\nMETRICS_HOSTNAME=localhost\\nMETRICS_PORT=8125\" > /home/ec2-user/webapp/.env",
     "sudo chmod -R 755 /home/ec2-user/webapp",
+    "sudo chmod 640 /home/ec2-user/webapp/.env",
+    "sudo chown ec2-user:ec2-user /home/ec2-user/webapp/.env",
     "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/ec2-user/webapp/api/cloudwatch/config.json -s"
   ]))
-    
-  
 
   lifecycle {
     create_before_destroy = true
   }
 }
-
-# resource "aws_launch_configuration" "asg_launch_config" {
-#   name_prefix                 = "asg_launch_config"
-#   # image_id                    = "ami-0f7d2d40f81acc547"
-#   image_id = data.aws_ami.my-node-ami.id
-#   instance_type               = var.configuration.ec2_instance.instance_type
-#   key_name                    = aws_key_pair.ec2.key_name
-#   iam_instance_profile        = aws_iam_instance_profile.ec2-profile.name
-#   associate_public_ip_address = true
-#   security_groups             = ["${aws_security_group.application.id}"]
-#   root_block_device {
-#     volume_size           = var.configuration.ec2_instance.volume_size
-#     volume_type           = var.configuration.ec2_instance.volume_type
-#     delete_on_termination = true
-#     encrypted = true
-#   }
-
-#   user_data = <<EOF
-#     #!/bin/bash
-
-#     echo "==================================="
-#     echo "Creating .env file to webapp"
-#     echo "==================================="
-#     touch /home/ec2-user/webapp/.env
-#     echo -e "PORT=8080\nDB_HOSTNAME=${aws_db_instance.app_db.address}\nDB_PORT=3306\nDB_USERNAME=${var.db_username}\nDB_PASSWORD=\"${var.db_password}\"\nDB_DBNAME=${var.configuration.database.db_name}\nAWS_BUCKET_NAME=${aws_s3_bucket.main_s3_bucket.bucket}\nAWS_BUCKET_REGION=${var.region}\nENVIRONMENT=production\nMETRICS_HOSTNAME=localhost\nMETRICS_PORT=8125" > /home/ec2-user/webapp/.env
-
-#     echo "==================================="
-#     echo "Chaning application ownership"
-#     echo "==================================="
-#     sudo chmod -R 755 /home/ec2-user/webapp
-
-#     echo "================================="
-#     echo "Configuring cloudwatch"
-#     echo "================================="
-#     sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-#     -a fetch-config \
-#     -m ec2 \
-#     -c file:/home/ec2-user/webapp/api/cloudwatch/config.json \
-#     -s
-#   EOF
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
 
 # Creating Autoscaling group
 resource "aws_autoscaling_group" "autoscaling_group" {
@@ -120,16 +74,17 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   force_delete              = true
   target_group_arns         = [aws_lb_target_group.lb_target_group.arn]
   vpc_zone_identifier       = [module.subnets[0].public-subnets-id, module.subnets[1].public-subnets-id, module.subnets[2].public-subnets-id]
+
   launch_template {
-    id = aws_launch_template.asg_launch_template.id
-    version = "$Latest"
+    id      = aws_launch_template.asg_launch_template.id
+    version = aws_launch_template.asg_launch_template.latest_version
   }
-  # launch_configuration = aws_launch_configuration.asg_launch_config.name
+
   instance_refresh {
     strategy = "Rolling"
     preferences {
       min_healthy_percentage = 90
-      instance_warmup = 60
+      instance_warmup        = 60
     }
   }
 
@@ -141,7 +96,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
 
   tag {
     key                 = "Name"
-    value               = "Autoscaling group"
+    value               = "Webapp Servers"
     propagate_at_launch = true
   }
 }
